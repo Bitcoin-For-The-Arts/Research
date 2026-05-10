@@ -26,7 +26,7 @@ BFTA's analytical case for why fiat debasement hits working artists harder than 
 - **Artist income data:** BLS Occupational Employment Statistics, NEA artist-employment studies, BEA ACPSA earnings tables
 - **Bitcoin reference:** Nakamoto (2008), *Bitcoin: A Peer-to-Peer Electronic Cash System*
 
-Full per-chart source IDs live in [`Bitcoin-For-The-Arts/Bitcoin-For-The-Arts/data/research/sound-money-for-the-arts.json`](https://github.com/Bitcoin-For-The-Arts/Bitcoin-For-The-Arts/blob/main/data/research/sound-money-for-the-arts.json).
+Full per-chart source IDs live in [`../../data/reports/sound-money-for-the-arts.json`](../../data/reports/sound-money-for-the-arts.json) — the canonical, citable source of truth. Hero image: [`../../media/images/Sound-Money-For-Sound-Arts.jpg`](../../media/images/Sound-Money-For-Sound-Arts.jpg). Downloadable PDF: [`../../pdfs/sound-money-for-the-arts.pdf`](../../pdfs/sound-money-for-the-arts.pdf).
 
 ## Editorial scope reminder
 
