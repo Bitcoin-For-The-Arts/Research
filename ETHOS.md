@@ -61,15 +61,7 @@ Our credibility is the asset. Every word in this repository is written against t
 
 ---
 
-## The reference frame: ACS-grade rigor, on a global scale
-
-Our reference institutions for what credibility looks like in nonprofit research:
-
-- **American Cancer Society — *Cancer Facts & Figures*** — for the annual, institutional, citation-dense, downloadable-PDF reference document we aspire to be for the arts.
-- **Brookings Institution — policy briefs** — for the seriousness of language, dense source apparatus, and policy framing.
-- **Pew Research** — for data-first reports, transparent methodology, and visual restraint.
-- **NEA Office of Research & Analysis** — for the sector-specific evidence standard we hold ourselves to.
-- **National Assembly of State Arts Agencies — annual state appropriations reports** — for ground-truth state-by-state public funding data.
+## A borderless mandate
 
 We are a **borderless currency for a borderless community.** US-headquartered today, global mandate from day one. Our research must hold up under scrutiny in any country where someone reads it.
 
@@ -89,4 +81,4 @@ These are not aspirations. They are constraints we have already accepted.
 
 ## A note on language
 
-Our writing aims for the register of a federal statistical agency or a major foundation's research arm. Plain. Precise. Footnoted. Confident without being loud. The audience is the journalist deciding whether to cite us, the program officer deciding whether to grant to us, the academic deciding whether to assign us, and the artist deciding whether to trust us. We write for them.
+Plain. Precise. Footnoted. Confident without being loud. The audience is the journalist deciding whether to cite us, the program officer deciding whether to grant to us, the academic deciding whether to assign us, and the artist deciding whether to trust us. We write for them.

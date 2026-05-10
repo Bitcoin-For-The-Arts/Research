@@ -26,7 +26,7 @@
 
 This is the public, citable, contributable home of **Bitcoin for the Arts Research** — the research arm of [Bitcoin For The Arts, Inc.](https://bitcoinforthearts.org), the first 501(c)(3) nonprofit paying artists in Bitcoin.
 
-Our mandate is to build a **doctoral-grade, primary-source research program on the funding and economic landscape of the arts — globally, on a sound-money standard.** We model our standard of evidence on the most respected nonprofit research programs in the world: the American Cancer Society's *Cancer Facts & Figures*, the Brookings Institution's policy briefs, Pew Research's data reports, and the National Endowment for the Arts' *Research & Analysis* series.
+Our mandate is to build a **primary-source research program on the funding and economic landscape of the arts — globally, on a sound-money standard.**
 
 Every claim in this repository is **traceable to a primary source.** If we do not have a reference, we do not publish the data. Period.
 
@@ -133,7 +133,7 @@ The short version:
 | 1 | Budgets, financial statements, audited statements, grant guidelines, official operating documents |
 | 2 | Government and statistical agencies (BEA, BLS, Treasury, NEA, NASAA, state and municipal finance offices, international equivalents) |
 | 3 | Peer-reviewed and university research with transparent methods |
-| 4 | Major nonprofit research organizations (Brookings, Pew, Candid / Foundation Center, Americans for the Arts) |
+| 4 | Major nonprofit research organizations (sector research from established philanthropic and arts-policy institutions) |
 | 5 | Reputable journalism and institutional reporting for live case studies and local examples when primary documents are unavailable |
 
 ### AI policy
