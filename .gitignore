@@ -1,0 +1,12 @@
+# Node / build
+node_modules/
+npm-debug.log
+.DS_Store
+
+# PDF build intermediates (regeneratable via `npm run build:pdfs`)
+pdfs/.debug-html/
+
+# Local env files
+.env
+.env.local
+.env.*.local
