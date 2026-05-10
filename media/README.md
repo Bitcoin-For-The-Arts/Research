@@ -25,7 +25,7 @@ Each chart in `charts/` must:
 
 1. Be derived from a dataset whose source is documented per [`../CITATIONS.md`](../CITATIONS.md)
 2. Carry a source caption when used in a report
-3. Match the BFTA visual standard — black + orange + lime palette over cream backgrounds; grayscale for supporting data; ACS / Brookings seriousness
+3. Match the BFTA visual standard — black + orange + lime palette over cream backgrounds; grayscale for supporting data; typography-driven seriousness over visual decoration
 
 ### `images/`
 

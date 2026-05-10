@@ -100,7 +100,7 @@ To translate a report:
 
 ## Style and voice
 
-We write in the register of a federal statistical agency or a major foundation's research arm. Plain. Precise. Footnoted. Confident without being loud.
+We write plain, precise, footnoted, confident without being loud.
 
 - **No advocacy language** ("we must," "the urgent need," "shocking," "alarming"). Let the numbers carry the argument.
 - **No partisan framing.** Public policy is described mechanically.

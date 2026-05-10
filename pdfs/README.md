@@ -1,8 +1,6 @@
 # PDFs
 
-Downloadable, print-ready PDF briefs for every **Bitcoin for the Arts Research** report.
-
-The standard we hold ourselves to is the American Cancer Society's *Cancer Facts & Figures* — a single, well-designed, deeply-cited PDF that a foundation officer, journalist, or academic can download, print, mark up, and place on a desk.
+Downloadable, print-ready PDF briefs for every **Bitcoin for the Arts Research** report. A single, well-designed, deeply-cited PDF that a foundation officer, journalist, or academic can download, print, mark up, and place on a desk.
 
 ## Current PDFs (v1)
 
@@ -16,7 +14,7 @@ Every figure in every PDF is derived from the canonical chart-data JSON at [`../
 
 ## What's in each brief
 
-The v1 PDF brief is in the Brookings / Pew / ACS register — typography-driven, dense, citable, footnote-rigorous. Each brief contains:
+The v1 PDF brief is typography-driven, dense, citable, and footnote-rigorous. Each brief contains:
 
 1. **Cover** — kicker, title, abstract, byline block (byline / last reviewed / license / suggested citation), and the report's four headline statistics ("hero strip"), each numbered against the *References* block.
 2. **Abstract** — repeated on the body's first page for journalists and researchers who skim.
@@ -43,7 +41,7 @@ node scripts/build-pdfs.mjs the-arpa-cliff   # build one
 The build script:
 
 1. Reads `data/reports/<slug>.json` (the canonical, citable source of truth).
-2. Renders the report through an inline HTML/CSS template (Brookings/ACS register, cream background, black text on Liberation Serif, orange/lime accents, full citation apparatus).
+2. Renders the report through an inline HTML/CSS template (cream background, black text on Liberation Serif, orange/lime accents, full citation apparatus).
 3. Generates an SVG bar chart inline for every chart in the JSON. Numbers come from the data file; no hardcoded values.
 4. Pipes the HTML through headless Chrome (`puppeteer-core` + the system Chrome at `CHROME_PATH`) to produce a print-ready PDF.
 
@@ -67,7 +65,7 @@ Where a specific page or figure is being cited, append the page or chart ID. The
 
 ## Roadmap
 
-v1 is the **structurally correct** brief: every figure cited, every chart rendered from the dataset, every reference resolved. v1.1 → v1.x will iterate on typography density and chart polish toward the ACS *Cancer Facts & Figures* target — without compromising the citation discipline that makes the briefs worth citing in the first place.
+v1 is the **structurally correct** brief: every figure cited, every chart rendered from the dataset, every reference resolved. v1.1 → v1.x will iterate on typography density and chart polish — without compromising the citation discipline that makes the briefs worth citing in the first place.
 
 Future passes:
 

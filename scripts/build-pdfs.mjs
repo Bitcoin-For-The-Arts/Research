@@ -6,7 +6,7 @@
 // renders each report through an inline HTML template, piped through headless
 // Chrome to produce pdfs/<slug>.pdf.
 //
-// The output is a v1 research brief in the Brookings / ACS / Pew register:
+// The output is a v1 research brief:
 //   - cream background, black text, serif body
 //   - orange + lime accents
 //   - hero strip with the report's four headline statistics
