@@ -27,7 +27,7 @@ A research brief on how temporary American Rescue Plan arts relief moved through
 - **2026** — SLFRF spend deadline (National League of Cities)
 - **$694.3M → $646.0M** — National state arts agency appropriations, FY2025 → FY2026 (Arts Midwest summary of NASAA data)
 
-Full source IDs and URLs live in [`Bitcoin-For-The-Arts/Bitcoin-For-The-Arts/data/research/the-arpa-cliff.json`](https://github.com/Bitcoin-For-The-Arts/Bitcoin-For-The-Arts/blob/main/data/research/the-arpa-cliff.json).
+Full source IDs and URLs live in [`../../data/reports/the-arpa-cliff.json`](../../data/reports/the-arpa-cliff.json) — the canonical, citable source of truth. Hero image: [`../../media/images/ARPA-Cliff.jpg`](../../media/images/ARPA-Cliff.jpg). Downloadable PDF: [`../../pdfs/the-arpa-cliff.pdf`](../../pdfs/the-arpa-cliff.pdf).
 
 ## Companion editorial
 

@@ -13,12 +13,15 @@ This is how we keep "all data must be verifiable" from being a slogan.
 ```
 data/
 ├── README.md
-├── state-arts-agencies/      ← state appropriations series
+├── reports/                  ← chart-data JSON behind every published BFTA report (canonical)
+├── state-arts-agencies/      ← state appropriations series (raw upstream data)
 ├── federal-arts-funding/     ← NEA, NEH, ARP, IMLS budgets and allocations
 ├── foundation-giving/        ← Candid / Foundation Center sector data
 ├── municipal-arts-budgets/   ← city-level culture-office budgets (added per case study)
 └── international/            ← global ministries of culture, UNESCO, OECD, Eurostat
 ```
+
+[`reports/`](reports/) is the **canonical, citable source of truth** for every chart and hero statistic in a published BFTA Research report. The other sub-folders hold the upstream raw data (full appropriations tables, full grant rolls, full filing dumps) from which the chart-ready slices in `reports/` are derived.
 
 (Some folders are seeded empty until the first dataset arrives. See [`../CONTRIBUTING.md`](../CONTRIBUTING.md) to contribute one.)
 
@@ -54,13 +57,14 @@ Each dataset is a JSON or CSV file accompanied by a short README documenting:
 
 ## Canonical chart-data location
 
-For reports already published on the live portal, the **canonical chart-data JSON** currently lives in the main BFTA repository at:
+The canonical chart-data JSON for every published BFTA Research report now lives in this repository at [`reports/`](reports/):
 
-- [`Bitcoin-For-The-Arts/Bitcoin-For-The-Arts/data/research/state-of-arts-funding-2026.json`](https://github.com/Bitcoin-For-The-Arts/Bitcoin-For-The-Arts/blob/main/data/research/state-of-arts-funding-2026.json)
-- [`Bitcoin-For-The-Arts/Bitcoin-For-The-Arts/data/research/the-arpa-cliff.json`](https://github.com/Bitcoin-For-The-Arts/Bitcoin-For-The-Arts/blob/main/data/research/the-arpa-cliff.json)
-- [`Bitcoin-For-The-Arts/Bitcoin-For-The-Arts/data/research/sound-money-for-the-arts.json`](https://github.com/Bitcoin-For-The-Arts/Bitcoin-For-The-Arts/blob/main/data/research/sound-money-for-the-arts.json)
+- [`reports/state-of-arts-funding-2026.json`](reports/state-of-arts-funding-2026.json)
+- [`reports/the-arpa-cliff.json`](reports/the-arpa-cliff.json)
+- [`reports/sound-money-for-the-arts.json`](reports/sound-money-for-the-arts.json)
+- [`reports/reports.json`](reports/reports.json) — portal index
 
-This research repository extends those datasets with **upstream raw data** (the full appropriations table, the full grant roll, the full filing dump) from which the chart-ready slices are derived. As the dataset corpus grows, the canonical chart-data JSON may migrate here and the main BFTA repo will consume it as a git submodule or release artifact.
+The live Next.js app at [`Bitcoin-For-The-Arts/Bitcoin-For-The-Arts`](https://github.com/Bitcoin-For-The-Arts/Bitcoin-For-The-Arts) currently ships byte-identical copies of these files at `data/research/` for runtime rendering on Vercel. **This repository wins** if the two ever diverge; the app copy is the one to update. A follow-up PR will switch the Next.js app to load these files from this repository directly so there is one location, not two.
 
 ## Contributing data
 
