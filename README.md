@@ -85,11 +85,13 @@ The economic, fiscal, demographic, and institutional reality of how the arts are
 
 ## Current reports (v1)
 
-| # | Report | Status | Web | Cover sheet | Data | PDF |
+| # | Report | Web | Cover | Narrative | Data | Full PDF |
 |---|---|---|---|---|---|---|
-| 1 | **The State of Arts Funding 2026** — flagship annual | Published v1 | [Read](https://bitcoinforthearts.org/research/state-of-arts-funding-2026) | [`reports/state-of-arts-funding-2026/`](reports/state-of-arts-funding-2026/) | [JSON](data/reports/state-of-arts-funding-2026.json) | [PDF](pdfs/state-of-arts-funding-2026.pdf) |
-| 2 | **The ARPA Cliff** — deep-dive on the 2026 expiration of pandemic arts stimulus | Published v1 | [Read](https://bitcoinforthearts.org/research/the-arpa-cliff) | [`reports/the-arpa-cliff/`](reports/the-arpa-cliff/) | [JSON](data/reports/the-arpa-cliff.json) | [PDF](pdfs/the-arpa-cliff.pdf) |
-| 3 | **Sound Money for the Arts** — how fiat debasement hits working artists, and why Bitcoin endowments change the funding horizon | Published v1 | [Read](https://bitcoinforthearts.org/research/sound-money-for-the-arts) | [`reports/sound-money-for-the-arts/`](reports/sound-money-for-the-arts/) | [JSON](data/reports/sound-money-for-the-arts.json) | [PDF](pdfs/sound-money-for-the-arts.pdf) |
+| 1 | **The State of Arts Funding 2026** — flagship annual | [Read](https://bitcoinforthearts.org/research/state-of-arts-funding-2026) | [README](reports/state-of-arts-funding-2026/) | [report.md](reports/state-of-arts-funding-2026/report.md) | [JSON](data/reports/state-of-arts-funding-2026.json) | [PDF](pdfs/state-of-arts-funding-2026.pdf) |
+| 2 | **The ARPA Cliff** — deep-dive on the 2026 expiration of pandemic arts stimulus | [Read](https://bitcoinforthearts.org/research/the-arpa-cliff) | [README](reports/the-arpa-cliff/) | [report.md](reports/the-arpa-cliff/report.md) | [JSON](data/reports/the-arpa-cliff.json) | [PDF](pdfs/the-arpa-cliff.pdf) |
+| 3 | **Sound Money for the Arts** — how fiat debasement hits working artists, and why Bitcoin endowments change the funding horizon | [Read](https://bitcoinforthearts.org/research/sound-money-for-the-arts) | [README](reports/sound-money-for-the-arts/) | [report.md](reports/sound-money-for-the-arts/report.md) | [JSON](data/reports/sound-money-for-the-arts.json) | [PDF](pdfs/sound-money-for-the-arts.pdf) |
+
+Each PDF is the **full report**, generated from the canonical Markdown narrative + JSON chart data by [`scripts/build-pdfs.mjs`](scripts/build-pdfs.mjs).
 
 ### Editorial articles (Substack mirrors)
 

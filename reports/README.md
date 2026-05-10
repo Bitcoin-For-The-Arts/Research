@@ -15,12 +15,12 @@ Full research reports published by **Bitcoin for the Arts Research**. Each repor
 ```
 reports/<slug>/
 ├── README.md            ← cover sheet: title, byline, last reviewed, abstract, sections, sources
-├── report.md            ← full text, with numbered citations
-├── data/                ← report-specific datasets (JSON/CSV) that drive charts
-├── figures/             ← chart images and figures, generated from data/
-├── pdf/                 ← downloadable PDF version(s) of the report
+├── report.md            ← canonical narrative body — full prose with [^N] citations,
+│                          {{chart:id}}, {{hero-stats}}, and ::: whymatters callouts
 └── translations/<lang>/ ← optional translations (see CONTRIBUTING.md)
 ```
+
+The chart-data JSON that backs every figure lives at [`../data/reports/<slug>.json`](../data/reports/). The downloadable PDF lives at [`../pdfs/<slug>.pdf`](../pdfs/) and is generated from `report.md` + the JSON by [`../scripts/build-pdfs.mjs`](../scripts/build-pdfs.mjs).
 
 ## Authoring conventions
 
