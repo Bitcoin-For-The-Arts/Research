@@ -1,35 +1,42 @@
 #!/usr/bin/env node
 // build-pdfs.mjs
 //
-// Generates print-ready PDF briefs for every Bitcoin for the Arts Research
-// report. Reads canonical chart-data JSON from data/reports/<slug>.json and
-// renders each report through an inline HTML template, piped through headless
-// Chrome to produce pdfs/<slug>.pdf.
+// Generates print-ready, full-narrative PDF reports for every
+// Bitcoin for the Arts Research report.
 //
-// The output is a v1 research brief:
-//   - cream background, black text, serif body
-//   - orange + lime accents
-//   - hero strip with the report's four headline statistics
-//   - charts rendered inline as SVG, derived directly from the JSON
-//   - source caption beneath every chart
-//   - References block at the end, numbered, with permanent URLs
-//   - institutional byline (Bitcoin for the Arts Research) and last-reviewed date
+// Reads:
+//   - data/reports/<slug>.json   canonical hero stats, charts, sources
+//   - reports/<slug>/report.md   canonical narrative body (Markdown)
+//
+// Writes:
+//   - pdfs/<slug>.pdf            downloadable, full report
+//
+// Markdown extensions used in report.md:
+//   [^N]                            citation reference; N is 1-indexed into sources[]
+//   {{chart:<id>}}                  chart placeholder; resolves to a chart in JSON
+//   {{hero-stats}}                  hero strip placeholder; resolves to the four heroStats
+//   ::: whymatters                  "Why this matters" callout block
+//   ... body ...
+//   :::
+//   > **Pull quote.** ...           blockquote rendered as a pull quote
 //
 // Usage:
-//   node scripts/build-pdfs.mjs               # builds every report
-//   node scripts/build-pdfs.mjs the-arpa-cliff # builds one
+//   node scripts/build-pdfs.mjs                 # build every report
+//   node scripts/build-pdfs.mjs the-arpa-cliff  # build one
 //
 // Environment:
-//   CHROME_PATH     path to Chrome / Chromium (defaults to /usr/local/bin/google-chrome)
+//   CHROME_PATH   path to Chrome / Chromium (defaults to /usr/local/bin/google-chrome)
 
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { marked } from 'marked';
 import puppeteer from 'puppeteer-core';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const repoRoot = join(here, '..');
 const dataDir = join(repoRoot, 'data', 'reports');
+const reportsDir = join(repoRoot, 'reports');
 const pdfDir = join(repoRoot, 'pdfs');
 const debugDir = join(repoRoot, 'pdfs', '.debug-html');
 
@@ -59,63 +66,25 @@ const SLUGS = slugArg
       .map((f) => f.replace(/\.json$/, ''))
       .sort();
 
-const REPORT_ABSTRACTS = {
-  'state-of-arts-funding-2026':
-    "BFTA's annual anchor document on public, private, and non-state-dependent funding of the arts in the United States, with the global research mandate as backdrop. The report establishes the funding landscape, documents the collapse of 2024–2026, traces who is hurt first, summarizes the market response from foundations and individual donors, and concludes with the analytical case for non-state-dependent funding.",
-  'the-arpa-cliff':
-    'A research brief on how temporary American Rescue Plan arts relief moved through federal, state, and local systems — and what happens as those dollars run off at the end of 2026. Built from primary sources at the National Endowment for the Arts, the U.S. Treasury, the National League of Cities, the National Assembly of State Arts Agencies, Arts Midwest, and individual state and municipal recovery programs.',
-  'sound-money-for-the-arts':
-    "BFTA's analytical case for why fiat debasement hits working artists harder than most professions — gig income, no equity capital, limited ability to time markets — and why Bitcoin-native endowments change the funding horizon for arts institutions. Analyzes purchasing-power decay of historical arts grants, the limits of traditional endowment spending rules under monetary expansion, and Bitcoin reserve durability over multi-decade horizons.",
-};
-
-const REPORT_SECTIONS = {
-  'state-of-arts-funding-2026': [
-    'Executive summary',
-    'The funding landscape today',
-    'The collapse: 2024–2026',
-    'Who gets hurt',
-    'The market response',
-    'The case for non-state-dependent funding',
-  ],
-  'the-arpa-cliff': [
-    'What the cliff actually looks like',
-    'Why cities cannot replace the cliff',
-    'Who gets hit first',
-    'What Bitcoin has to do with this',
-    'State-by-state source table',
-  ],
-  'sound-money-for-the-arts': [
-    'Why working artists are exposed',
-    'Purchasing power decay',
-    'Traditional endowment limits',
-    'Bitcoin reserve durability',
-    'Risks, caveats, and fiduciary framing',
-  ],
-};
-
-const REPORT_KICKERS = {
-  'state-of-arts-funding-2026': 'Flagship annual report',
-  'the-arpa-cliff': 'Deep-dive #1',
-  'sound-money-for-the-arts': 'Deep-dive #2',
-};
-
 mkdirSync(pdfDir, { recursive: true });
 mkdirSync(debugDir, { recursive: true });
 
-const escape = (s) =>
+// ---------- helpers ----------
+
+const escapeHtml = (s) =>
   String(s).replace(/[&<>"']/g, (c) =>
     ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c],
   );
 
-const formatValue = (chart, value) => {
+function formatChartValue(chart, value) {
   const v =
     Math.abs(value) >= 1000
       ? value.toLocaleString('en-US', { maximumFractionDigits: 1 })
       : value.toLocaleString('en-US', { maximumFractionDigits: 2 });
   return `${chart.valuePrefix ?? ''}${v}${chart.valueSuffix ?? ''}`;
-};
+}
 
-function renderBarChart(chart) {
+function renderBarChartSvg(chart) {
   const w = 660;
   const padLeft = 170;
   const padRight = 24;
@@ -136,86 +105,182 @@ function renderBarChart(chart) {
       const x = padLeft;
       return `
         <g>
-          <text x="${padLeft - 12}" y="${cy + 5}" text-anchor="end" class="bar-label">${escape(d.label)}</text>
+          <text x="${padLeft - 12}" y="${cy + 5}" text-anchor="end" class="bar-label">${escapeHtml(d.label)}</text>
           <rect x="${x}" y="${cy - barH / 2}" width="${len}" height="${barH}" rx="3" class="bar ${isNegative ? 'bar-neg' : ''}" />
-          <text x="${x + len + 8}" y="${cy + 5}" class="bar-value">${escape(formatValue(chart, d.value))}</text>
+          <text x="${x + len + 8}" y="${cy + 5}" class="bar-value">${escapeHtml(formatChartValue(chart, d.value))}</text>
         </g>`;
     })
     .join('');
 
   return `
-  <svg viewBox="0 0 ${w} ${h}" role="img" aria-label="${escape(chart.title)}" class="chart-svg">
+  <svg viewBox="0 0 ${w} ${h}" role="img" aria-label="${escapeHtml(chart.title)}" class="chart-svg">
     <line x1="${padLeft}" y1="${top}" x2="${padLeft}" y2="${h - bottom}" class="axis" />
     ${rows}
   </svg>`;
 }
 
-function renderChart(chart, report) {
+function renderChartFigure(chart, report) {
   const sources = (chart.sourceIds ?? [])
     .map((id) => report.sources.find((s) => s.id === id))
     .filter(Boolean);
   const caption = sources.length
-    ? `Source${sources.length > 1 ? 's' : ''}: ${sources
-        .map((s) => escape(s.label))
-        .join('; ')}.`
+    ? `Source${sources.length > 1 ? 's' : ''}: ${sources.map((s) => escapeHtml(s.label)).join('; ')}.`
     : '';
 
   return `
   <figure class="chart">
-    <figcaption class="chart-title">${escape(chart.title)}</figcaption>
-    <p class="chart-description">${escape(chart.description ?? '')}</p>
-    ${renderBarChart(chart)}
+    <figcaption class="chart-title">${escapeHtml(chart.title)}</figcaption>
+    <p class="chart-description">${escapeHtml(chart.description ?? '')}</p>
+    ${renderBarChartSvg(chart)}
     ${caption ? `<p class="chart-source">${caption}</p>` : ''}
   </figure>`;
 }
 
-function renderHeroStat(stat, report, idx) {
-  const sourceCaption = (stat.sourceIds ?? [])
-    .map((id) => {
-      const i = report.sources.findIndex((s) => s.id === id);
-      return i >= 0 ? `[${i + 1}]` : null;
+function renderHeroStats(report) {
+  if (!report.heroStats?.length) return '';
+  const items = report.heroStats
+    .map((stat) => {
+      const refs = (stat.sourceIds ?? [])
+        .map((id) => {
+          const i = report.sources.findIndex((s) => s.id === id);
+          return i >= 0 ? `<a href="#ref-${escapeHtml(report.sources[i].id)}">[${i + 1}]</a>` : null;
+        })
+        .filter(Boolean)
+        .join(' ');
+      return `
+        <div class="hero-stat">
+          <div class="hero-value">${escapeHtml(stat.value)}</div>
+          <div class="hero-label">${escapeHtml(stat.label)}</div>
+          <p class="hero-context">${escapeHtml(stat.context)}${refs ? ` <sup>${refs}</sup>` : ''}</p>
+        </div>`;
     })
-    .filter(Boolean)
-    .join(' ');
-
-  return `
-    <div class="hero-stat">
-      <div class="hero-value">${escape(stat.value)}</div>
-      <div class="hero-label">${escape(stat.label)}</div>
-      <p class="hero-context">${escape(stat.context)}${sourceCaption ? ` <sup>${sourceCaption}</sup>` : ''}</p>
-    </div>`;
-}
-
-function renderReferences(report) {
-  return report.sources
-    .map(
-      (s, i) => `
-      <li id="ref-${escape(s.id)}">
-        <span class="ref-n">[${i + 1}]</span>
-        <span class="ref-body">${escape(s.label)}. <a href="${escape(s.href)}">${escape(s.href)}</a></span>
-      </li>`,
-    )
     .join('');
+  return `<div class="hero-strip">${items}</div>`;
 }
 
-function renderHTML(report, slug) {
-  const abstract = REPORT_ABSTRACTS[slug] ?? '';
-  const sections = REPORT_SECTIONS[slug] ?? [];
-  const kicker = REPORT_KICKERS[slug] ?? 'Research brief';
+function renderReferencesBlock(report) {
+  return `
+    <ol class="references-list">
+      ${report.sources
+        .map(
+          (s, i) => `
+        <li id="ref-${escapeHtml(s.id)}">
+          <span class="ref-n">[${i + 1}]</span>
+          <span class="ref-body">${escapeHtml(s.label)}. <a href="${escapeHtml(s.href)}">${escapeHtml(s.href)}</a></span>
+        </li>`,
+        )
+        .join('')}
+    </ol>`;
+}
+
+// ---------- markdown ----------
+
+function parseFrontMatter(raw) {
+  const m = raw.match(/^---\n([\s\S]*?)\n---\n/);
+  if (!m) return { meta: {}, body: raw };
+  const meta = {};
+  for (const line of m[1].split('\n')) {
+    const kv = line.match(/^([A-Za-z][\w-]*)\s*:\s*(.*)$/);
+    if (kv) meta[kv[1]] = kv[2].trim();
+  }
+  return { meta, body: raw.slice(m[0].length) };
+}
+
+// Convert ::: whymatters ... ::: fenced callouts to HTML before marked sees them.
+// Convert {{chart:id}} and {{hero-stats}} to safe placeholder tokens that survive
+// markdown rendering and can be substituted afterwards.
+function preprocessMarkdown(md) {
+  // ## Heading {#anchor}   → strip the anchor; we re-apply it as an id attribute
+  // via a post-render pass on the rendered <h2>.
+  // Embed the anchor in a comment marker that survives marked.
+  md = md.replace(
+    /^(#{1,6})\s+(.+?)\s*\{#([a-zA-Z0-9_-]+)\}\s*$/gm,
+    (_, hashes, title, id) => `${hashes} ${title}\n<!--anchor:${id}-->`,
+  );
+  // ::: whymatters \n ... \n :::
+  md = md.replace(
+    /^:::\s*whymatters\s*\n([\s\S]*?)\n:::\s*$/gm,
+    (_, body) => `\n<aside data-callout="whymatters">\n${body}\n</aside>\n`,
+  );
+  // {{chart:id}}
+  md = md.replace(/\{\{chart:([a-zA-Z0-9_-]+)\}\}/g, (_, id) => `\n<div data-chart="${id}"></div>\n`);
+  // {{hero-stats}}
+  md = md.replace(/\{\{hero-stats\}\}/g, () => `\n<div data-hero-stats="true"></div>\n`);
+  return md;
+}
+
+// After marked, replace placeholder divs with rendered HTML, replace footnote
+// references [^N] with superscript links, and identify blockquotes that begin
+// with "Pull quote." as pullquotes.
+function postprocessHtml(html, report) {
+  // <h2>Title</h2>\n<!--anchor:id-->  → <h2 id="id">Title</h2>
+  html = html.replace(
+    /<(h[1-6])>([\s\S]*?)<\/\1>\s*<!--anchor:([a-zA-Z0-9_-]+)-->/g,
+    (_, tag, inner, id) => `<${tag} id="${id}">${inner}</${tag}>`,
+  );
+
+  // chart placeholders
+  html = html.replace(/<div data-chart="([a-zA-Z0-9_-]+)"><\/div>/g, (_, id) => {
+    const chart = report.charts?.find((c) => c.id === id);
+    if (!chart) {
+      console.error(`  warning: unknown chart id "${id}" in report ${report.slug}`);
+      return '';
+    }
+    return renderChartFigure(chart, report);
+  });
+
+  // hero-stats placeholder
+  html = html.replace(/<div data-hero-stats="true"><\/div>/g, () => renderHeroStats(report));
+
+  // footnote refs [^N] -> superscript link to references
+  html = html.replace(/\[\^(\d+)\]/g, (_, nStr) => {
+    const n = parseInt(nStr, 10);
+    const source = report.sources?.[n - 1];
+    if (!source) return `<sup>[${nStr}]</sup>`;
+    return `<sup class="cite"><a href="#ref-${escapeHtml(source.id)}">[${n}]</a></sup>`;
+  });
+
+  // blockquotes starting with <strong>Pull quote.</strong> => pullquote class
+  html = html.replace(
+    /<blockquote>\s*<p>\s*<strong>Pull quote\.<\/strong>\s*/g,
+    '<blockquote class="pullquote"><p>',
+  );
+
+  // promote callout asides to <div class="callout"> with heading
+  html = html.replace(
+    /<aside data-callout="whymatters">([\s\S]*?)<\/aside>/g,
+    (_, body) => `<div class="callout"><div class="callout-label">Why this matters</div>${body.trim()}</div>`,
+  );
+
+  return html;
+}
+
+function renderReportBody(report, reportMd) {
+  const { meta, body } = parseFrontMatter(reportMd);
+  const preprocessed = preprocessMarkdown(body);
+  const rendered = marked.parse(preprocessed, { gfm: true, breaks: false });
+  const post = postprocessHtml(rendered, report);
+  return { meta, html: post };
+}
+
+// ---------- top-level document ----------
+
+function renderHTML(report, reportMd) {
+  const { meta, html: body } = renderReportBody(report, reportMd);
+  const kicker = meta.kicker || '';
+  const status = meta.status || 'Version 1.0';
 
   return `<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<title>${escape(report.title)} — Bitcoin for the Arts Research</title>
+<title>${escapeHtml(report.title)} — Bitcoin for the Arts Research</title>
 <style>
-  /* ----- BFTA Research print-brief stylesheet ----- */
-
   @page {
     size: Letter;
     margin: 0.85in 0.75in 0.85in 0.75in;
     @bottom-left   { content: "Bitcoin for the Arts Research"; font: 9pt "Liberation Serif", "Tinos", "DejaVu Serif", Georgia, serif; color: #555; }
-    @bottom-center { content: "${escape(report.title)}"; font: 9pt "Liberation Serif", "Tinos", "DejaVu Serif", Georgia, serif; color: #555; }
+    @bottom-center { content: "${escapeHtml(report.title)}"; font: 9pt "Liberation Serif", "Tinos", "DejaVu Serif", Georgia, serif; color: #555; }
     @bottom-right  { content: "Page " counter(page) " of " counter(pages); font: 9pt "Liberation Serif", "Tinos", "DejaVu Serif", Georgia, serif; color: #555; }
   }
   @page :first { @bottom-left { content: ""; } @bottom-center { content: ""; } @bottom-right { content: ""; } }
@@ -233,15 +298,12 @@ function renderHTML(report, slug) {
 
   html, body { background: var(--cream); color: var(--ink); margin: 0; padding: 0; }
   body {
-    font: 11pt/1.55 "Liberation Serif", "Tinos", "DejaVu Serif", "Charter", Georgia, serif;
+    font: 10.5pt/1.55 "Liberation Serif", "Tinos", "DejaVu Serif", "Charter", Georgia, serif;
     -webkit-font-smoothing: antialiased;
   }
-
-  /* Font aliases used throughout — keep changes here to retune the whole brief */
-  .ff-serif { font-family: "Liberation Serif", "Tinos", "DejaVu Serif", "Charter", Georgia, serif; }
-  .ff-sans  { font-family: "Liberation Sans", "DejaVu Sans", "Noto Sans", Arial, sans-serif; }
   a { color: var(--ink); text-decoration: none; border-bottom: 1px solid var(--rule); word-break: break-word; }
   sup { font-size: 0.72em; vertical-align: super; line-height: 0; }
+  sup.cite a { border: none; font-weight: 600; }
 
   .kicker {
     font: 600 9pt/1 "Liberation Sans", "DejaVu Sans", "Noto Sans", Arial, sans-serif;
@@ -251,7 +313,6 @@ function renderHTML(report, slug) {
   }
 
   /* ----- cover ----- */
-
   .cover { page-break-after: always; padding-top: 0.2in; }
   .cover .lockup {
     display: flex; align-items: baseline; justify-content: space-between;
@@ -261,22 +322,17 @@ function renderHTML(report, slug) {
     font: 700 12pt/1 "Liberation Sans", "DejaVu Sans", "Noto Sans", Arial, sans-serif;
     letter-spacing: 0.04em; text-transform: uppercase;
   }
-  .cover .lockup .org em {
-    color: var(--accent); font-style: normal; font-weight: 700;
-  }
+  .cover .lockup .org em { color: var(--accent); font-style: normal; font-weight: 700; }
   .cover .lockup .meta {
     font: 9pt/1.4 "Liberation Sans", "DejaVu Sans", "Noto Sans", Arial, sans-serif;
     color: var(--muted); text-align: right;
   }
-
   .cover h1 {
-    font: 700 44pt/1.05 "Liberation Serif", "Tinos", "DejaVu Serif", "Charter", Georgia, serif;
-    letter-spacing: -0.01em;
-    margin: 0 0 0.35in 0;
-    max-width: 6in;
+    font: 700 42pt/1.05 "Liberation Serif", "Tinos", "DejaVu Serif", Georgia, serif;
+    letter-spacing: -0.01em; margin: 0 0 0.35in 0; max-width: 6.2in;
   }
   .cover .dek {
-    font: 400 14pt/1.5 "Liberation Serif", "Tinos", "DejaVu Serif", "Charter", Georgia, serif;
+    font: 400 14pt/1.5 "Liberation Serif", "Tinos", "DejaVu Serif", Georgia, serif;
     color: var(--ink); max-width: 6.2in; margin: 0 0 0.55in 0;
   }
   .byline-block {
@@ -287,74 +343,97 @@ function renderHTML(report, slug) {
   }
   .byline-block strong { color: var(--ink); font-weight: 600; }
 
-  /* hero strip on the cover */
-  .hero-strip {
-    margin-top: 0.7in;
-    display: grid; grid-template-columns: 1fr 1fr;
-    gap: 0.4in 0.5in;
-  }
-  .hero-stat { border-top: 1px solid var(--black); padding-top: 0.18in; }
-  .hero-value {
-    font: 700 36pt/1 "Liberation Serif", "Tinos", "DejaVu Serif", "Charter", Georgia, serif;
-    color: var(--black);
-  }
-  .hero-value::first-letter { color: inherit; }
-  .hero-label {
-    margin-top: 0.05in;
-    font: 600 9pt/1 "Liberation Sans", "DejaVu Sans", "Noto Sans", Arial, sans-serif;
-    letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent);
-  }
-  .hero-context {
-    margin: 0.12in 0 0; font-size: 10pt; line-height: 1.45; color: var(--ink);
-  }
-
   /* ----- body ----- */
-
-  .body { padding-top: 0.05in; }
+  .body {
+    padding-top: 0.05in;
+  }
   .body h2 {
-    font: 700 18pt/1.15 "Liberation Serif", "Tinos", "DejaVu Serif", "Charter", Georgia, serif;
-    margin: 0.45in 0 0.12in 0;
+    font: 700 17pt/1.15 "Liberation Serif", "Tinos", "DejaVu Serif", Georgia, serif;
+    margin: 0.5in 0 0.12in 0;
     border-top: 1px solid var(--rule);
     padding-top: 0.18in;
     page-break-after: avoid;
   }
-  .body h2.first { margin-top: 0; border-top: none; padding-top: 0; }
-  .body h3 {
-    font: 700 11pt/1.15 "Liberation Sans", "DejaVu Sans", "Noto Sans", Arial, sans-serif;
-    letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted);
-    margin: 0.25in 0 0.08in 0;
+  .body section:first-of-type h2,
+  .body h2:first-of-type { margin-top: 0.05in; border-top: none; padding-top: 0; }
+  .body p {
+    margin: 0 0 0.14in 0;
+    text-align: justify;
+    hyphens: auto;
   }
-  .body p { margin: 0 0 0.16in 0; }
-  .body .lead { font-size: 12.5pt; line-height: 1.6; }
+  .body p + p { text-indent: 0; }
+  .body h2 + p { margin-top: 0.05in; }
 
-  .pullquote {
+  /* hero strip embedded in body */
+  .hero-strip {
+    margin: 0.25in 0 0.05in 0;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 0.3in 0.45in;
+    page-break-inside: avoid;
+  }
+  .hero-stat {
+    border-top: 1px solid var(--black);
+    padding-top: 0.12in;
+  }
+  .hero-value {
+    font: 700 30pt/1 "Liberation Serif", "Tinos", "DejaVu Serif", Georgia, serif;
+    color: var(--black);
+  }
+  .hero-label {
+    margin-top: 0.04in;
+    font: 600 9pt/1 "Liberation Sans", "DejaVu Sans", "Noto Sans", Arial, sans-serif;
+    letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent);
+  }
+  .hero-context {
+    margin: 0.08in 0 0; font-size: 9.5pt; line-height: 1.45; color: var(--ink);
+    text-align: left;
+  }
+  .hero-context sup a { border: none; }
+
+  /* pull quotes */
+  blockquote.pullquote {
     border-left: 4px solid var(--accent);
-    padding: 0.08in 0.18in;
-    margin: 0.25in 0;
-    font-size: 12pt; font-style: italic; color: var(--ink);
+    padding: 0.08in 0.22in;
+    margin: 0.28in 0;
     background: var(--cream);
   }
+  blockquote.pullquote p {
+    font: italic 13pt/1.5 "Liberation Serif", "Tinos", "DejaVu Serif", Georgia, serif;
+    margin: 0;
+    text-align: left;
+  }
 
+  /* generic blockquotes (fallback) */
+  blockquote {
+    border-left: 3px solid var(--rule);
+    margin: 0.2in 0;
+    padding: 0.04in 0.18in;
+    color: var(--ink);
+  }
+
+  /* Why this matters callout */
   .callout {
     background: var(--accent-soft);
     border-left: 4px solid var(--accent);
-    padding: 0.18in 0.22in; margin: 0.25in 0;
+    padding: 0.18in 0.24in; margin: 0.28in 0;
+    page-break-inside: avoid;
   }
-  .callout .label {
+  .callout-label {
     font: 700 9pt/1 "Liberation Sans", "DejaVu Sans", "Noto Sans", Arial, sans-serif;
     letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent);
-    margin-bottom: 0.06in;
+    margin-bottom: 0.08in;
   }
+  .callout p { margin: 0 0 0.08in 0; text-align: left; }
+  .callout p:last-child { margin: 0; }
 
-  /* ----- charts ----- */
-
+  /* charts */
   .chart { margin: 0.32in 0; page-break-inside: avoid; }
   .chart-title {
-    font: 700 12pt/1.3 "Liberation Serif", "Tinos", "DejaVu Serif", "Charter", Georgia, serif;
+    font: 700 12pt/1.3 "Liberation Serif", "Tinos", "DejaVu Serif", Georgia, serif;
     margin-bottom: 0.04in;
   }
   .chart-description {
     margin: 0 0 0.12in 0; font-size: 10pt; color: var(--ink); line-height: 1.5;
+    text-align: left;
   }
   .chart-svg { width: 100%; height: auto; }
   .chart-svg .axis { stroke: var(--ink); stroke-width: 1; }
@@ -372,47 +451,31 @@ function renderHTML(report, slug) {
     margin: 0.06in 0 0 0;
     font: 9pt/1.45 "Liberation Sans", "DejaVu Sans", "Noto Sans", Arial, sans-serif;
     color: var(--muted);
+    text-align: left;
   }
 
-  /* ----- planned sections list ----- */
-
-  .planned-sections {
-    margin: 0.25in 0;
-    padding: 0; list-style: none;
-    border-top: 1px solid var(--rule);
-  }
-  .planned-sections li {
-    padding: 0.12in 0; border-bottom: 1px solid var(--rule);
-    font: 11pt/1.4 "Liberation Serif", "Tinos", "DejaVu Serif", Georgia, serif;
-    display: flex; gap: 0.18in; align-items: baseline;
-  }
-  .planned-sections .n {
-    font: 700 10pt/1 "Liberation Sans", "DejaVu Sans", "Noto Sans", Arial, sans-serif;
-    color: var(--accent);
-    width: 0.4in; flex: 0 0 0.4in;
-  }
-
-  /* ----- references ----- */
-
+  /* references */
   .references { page-break-before: always; }
-  .references h2 { border-top: none; padding-top: 0; margin-top: 0; }
-  .references ol {
-    list-style: none; padding: 0; margin: 0;
-    counter-reset: ref;
+  .references h2 {
+    border-top: none; padding-top: 0; margin-top: 0;
+    font: 700 17pt/1.15 "Liberation Serif", "Tinos", "DejaVu Serif", Georgia, serif;
+    margin-bottom: 0.18in;
   }
-  .references li {
+  .references-list {
+    list-style: none; padding: 0; margin: 0;
+  }
+  .references-list li {
     padding: 0.08in 0; border-bottom: 1px solid var(--rule);
     font-size: 10pt; line-height: 1.5;
     display: grid; grid-template-columns: 0.45in 1fr; gap: 0.1in;
   }
-  .references .ref-n {
+  .ref-n {
     font: 700 10pt/1.5 "Liberation Sans", "DejaVu Sans", "Noto Sans", Arial, sans-serif;
     color: var(--accent);
   }
-  .references .ref-body a { font-size: 9.5pt; color: var(--muted); }
+  .ref-body a { font-size: 9.5pt; color: var(--muted); }
 
-  /* ----- colophon ----- */
-
+  /* colophon */
   .colophon {
     margin-top: 0.4in;
     padding-top: 0.18in; border-top: 2px solid var(--black);
@@ -428,74 +491,39 @@ function renderHTML(report, slug) {
     <div class="lockup">
       <div class="org">Bitcoin <em>for the</em> Arts <span style="color: var(--muted); font-weight: 500; letter-spacing: 0.02em;">Research</span></div>
       <div class="meta">
-        ${escape(kicker)}<br />
-        Last reviewed ${escape(report.lastReviewed)}
+        ${escapeHtml(kicker || status)}<br />
+        Last reviewed ${escapeHtml(report.lastReviewed)}
       </div>
     </div>
 
-    <div class="kicker">${escape(kicker)}</div>
-    <h1>${escape(report.title)}</h1>
-    <p class="dek">${escape(abstract)}</p>
+    ${kicker ? `<div class="kicker">${escapeHtml(kicker)}</div>` : ''}
+    <h1>${escapeHtml(report.title)}</h1>
+    <p class="dek">A full report from Bitcoin for the Arts Research. Every figure is traceable to a primary source listed in the References block at the end of this document. The institutional byline is "Bitcoin for the Arts Research" — there are no personal bylines on BFTA reports.</p>
 
     <div class="byline-block">
-      <div><strong>Byline</strong><br />${escape(report.byline)}</div>
-      <div><strong>Last reviewed</strong><br />${escape(report.lastReviewed)}</div>
+      <div><strong>Byline</strong><br />${escapeHtml(report.byline)}</div>
+      <div><strong>Last reviewed</strong><br />${escapeHtml(report.lastReviewed)}</div>
+      <div><strong>Status</strong><br />${escapeHtml(status)}</div>
       <div><strong>License</strong><br />Creative Commons Attribution 4.0 (CC&nbsp;BY&nbsp;4.0)</div>
-      <div><strong>Citation</strong><br />Bitcoin for the Arts Research. (2026). <em>${escape(report.title)}</em>.</div>
+      <div style="grid-column: 1 / -1;"><strong>Citation</strong><br />Bitcoin for the Arts Research. (2026). <em>${escapeHtml(report.title)}</em>. Bitcoin For The Arts, Inc. https://bitcoinforthearts.org/research/${escapeHtml(report.slug)}</div>
     </div>
-
-    ${
-      report.heroStats?.length
-        ? `<div class="hero-strip">${report.heroStats.map((s) => renderHeroStat(s, report)).join('')}</div>`
-        : ''
-    }
   </section>
 
   <section class="body">
-    <h2 class="first">Abstract</h2>
-    <p class="lead">${escape(abstract)}</p>
-
-    <div class="callout">
-      <div class="label">Why this brief exists</div>
-      <p style="margin:0;">Bitcoin for the Arts Research is the public research program of Bitcoin For The Arts, Inc., a 501(c)(3) nonprofit. Every claim in this document is traceable to a primary source. The institutional byline is "Bitcoin for the Arts Research" — there are no personal bylines on BFTA reports. See the live web version for the full report; this PDF is the citable, print-ready brief.</p>
-    </div>
-
-    ${
-      sections.length
-        ? `<h2>Report structure</h2>
-           <ol class="planned-sections">
-             ${sections
-               .map((s, i) => `<li><span class="n">${(i + 1).toString().padStart(2, '0')}</span><span>${escape(s)}</span></li>`)
-               .join('')}
-           </ol>`
-        : ''
-    }
-
-    ${
-      report.charts?.length
-        ? `<h2>Headline charts</h2>
-           ${report.charts.map((c) => renderChart(c, report)).join('')}`
-        : ''
-    }
-
-    <h2>Where to read the full report</h2>
-    <p>The complete, web-rendered version of this report — with full narrative text, source-linked footnotes, and any updates posted since this PDF was generated — lives at <a href="https://bitcoinforthearts.org/research/${escape(report.slug)}">bitcoinforthearts.org/research/${escape(report.slug)}</a>. The canonical, citable chart-data JSON behind every number in this brief is published at <a href="https://github.com/Bitcoin-For-The-Arts/Research/blob/main/data/reports/${escape(report.slug)}.json">github.com/Bitcoin-For-The-Arts/Research</a>.</p>
-
-    <div class="pullquote">
-      "If we do not have a reference, we do not publish the data. Period." — BFTA Research methodology
-    </div>
+    ${body}
   </section>
 
   <section class="references">
     <h2>References</h2>
-    <ol>${renderReferences(report)}</ol>
+    ${renderReferencesBlock(report)}
 
     <div class="colophon">
-      <strong>About this brief.</strong> This PDF is generated from
-      <code>data/reports/${escape(report.slug)}.json</code> in the public
+      <strong>About this report.</strong> This PDF is generated from
+      <code>data/reports/${escapeHtml(report.slug)}.json</code> and
+      <code>reports/${escapeHtml(report.slug)}/report.md</code> in the public
       research repository at github.com/Bitcoin-For-The-Arts/Research using the
-      build script <code>scripts/build-pdfs.mjs</code>. Every figure shown in
-      this brief is derived from the same JSON dataset and the primary sources
+      build script <code>scripts/build-pdfs.mjs</code>. Every figure in this
+      report is derived from the same JSON dataset and the primary sources
       listed above. Corrections and source updates may be submitted at
       <a href="https://github.com/Bitcoin-For-The-Arts/Research/issues">github.com/Bitcoin-For-The-Arts/Research/issues</a>
       or by emailing <a href="mailto:info@bitcoinforthearts.org">info@bitcoinforthearts.org</a>.
@@ -513,14 +541,16 @@ function renderHTML(report, slug) {
 
 async function build(slug) {
   const dataPath = join(dataDir, `${slug}.json`);
-  if (!existsSync(dataPath)) {
-    throw new Error(`No dataset at ${dataPath}`);
-  }
-  const report = JSON.parse(readFileSync(dataPath, 'utf8'));
+  const reportPath = join(reportsDir, slug, 'report.md');
 
-  const html = renderHTML(report, slug);
-  const htmlPath = join(debugDir, `${slug}.html`);
-  writeFileSync(htmlPath, html);
+  if (!existsSync(dataPath)) throw new Error(`No dataset at ${dataPath}`);
+  if (!existsSync(reportPath)) throw new Error(`No report markdown at ${reportPath}`);
+
+  const report = JSON.parse(readFileSync(dataPath, 'utf8'));
+  const reportMd = readFileSync(reportPath, 'utf8');
+
+  const html = renderHTML(report, reportMd);
+  writeFileSync(join(debugDir, `${slug}.html`), html);
 
   const browser = await puppeteer.launch({
     executablePath: CHROME_PATH,
