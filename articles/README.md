@@ -22,13 +22,16 @@ articles/<slug>/
 └── figures/             ← optional charts/images used in the article
 ```
 
-## Currently planned mirrors
+## Current mirrors
 
-Pending migration from the BFTA main repo's `docs/substack-strategy/drafts/`:
+| Slug | Title | Channel | Companion report |
+|---|---|---|---|
+| [`the-arpa-cliff/`](the-arpa-cliff/) | The ARPA Cliff | Substack | [`reports/the-arpa-cliff/`](../reports/the-arpa-cliff/) |
+| [`the-blueprint-david-simon-left-behind/`](the-blueprint-david-simon-left-behind/) | The Blueprint David Simon Left Behind | Substack | [`reports/the-arpa-cliff/`](../reports/the-arpa-cliff/), [`reports/state-of-arts-funding-2026/`](../reports/state-of-arts-funding-2026/) |
+| [`the-lights-are-going-out/`](the-lights-are-going-out/) | The Lights Are Going Out. Bitcoin Is the Only Switch Left. | Substack | [`reports/state-of-arts-funding-2026/`](../reports/state-of-arts-funding-2026/) |
+| [`is-war-good-for-bitcoin/`](is-war-good-for-bitcoin/) | Is War Good for Bitcoin? | Substack | [`reports/sound-money-for-the-arts/`](../reports/sound-money-for-the-arts/) |
 
-- **The ARPA Cliff** — the editorial framing of [`reports/the-arpa-cliff/`](../reports/the-arpa-cliff/)
-- **The Blueprint David Simon Left Behind** — Baltimore School for the Arts foundation-model case study; companion to the ARPA Cliff
-- **Sound Money for Sound Arts** — editorial framing of [`reports/sound-money-for-the-arts/`](../reports/sound-money-for-the-arts/)
+Each article folder contains a cover-sheet `README.md`, the full `article.md`, and (where applicable) `notes.md` with primary-source research notes assembled while drafting.
 
 To propose a new article, open an issue with the label `article-proposal`. See [`../CONTRIBUTING.md`](../CONTRIBUTING.md).
 

@@ -43,6 +43,15 @@ Beehiiv drafts and other newsletter source files in the main BFTA repository liv
 
 When a newsletter issue is research-relevant, the editorial draft from those folders is reviewed against the citation standard and mirrored here as the canonical archive copy.
 
+### Current state
+
+As of the most recent review of the BFTA main repository's newsletter folders, no issues meet the research-relevance bar for inclusion here:
+
+- The Beehiiv issues currently on file (Vegas-conference attendance announcement, Issue #6 May 4 2026 program update) are operational and fundraising-focused rather than research-focused.
+- Research-bearing newsletter issues — typically those reporting a primary-sourced statistic, summarizing a new BFTA report, or documenting a development in the funding landscape — will be mirrored here as they are sent.
+
+The folder is scaffolded and ready. The first research-relevant issue lands here as a follow-up PR.
+
 ## Citation standard
 
 Newsletters follow the same citation discipline as reports and articles — see [`../METHODOLOGY.md`](../METHODOLOGY.md). Short format is fine. Unsourced claims are not.

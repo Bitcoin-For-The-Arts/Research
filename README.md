@@ -91,6 +91,15 @@ The economic, fiscal, demographic, and institutional reality of how the arts are
 | 2 | **The ARPA Cliff** — deep-dive on the 2026 expiration of pandemic arts stimulus | Published v1 | [Read](https://bitcoinforthearts.org/research/the-arpa-cliff) | [`reports/the-arpa-cliff/`](reports/the-arpa-cliff/) | [JSON](data/reports/the-arpa-cliff.json) | [PDF](pdfs/the-arpa-cliff.pdf) |
 | 3 | **Sound Money for the Arts** — how fiat debasement hits working artists, and why Bitcoin endowments change the funding horizon | Published v1 | [Read](https://bitcoinforthearts.org/research/sound-money-for-the-arts) | [`reports/sound-money-for-the-arts/`](reports/sound-money-for-the-arts/) | [JSON](data/reports/sound-money-for-the-arts.json) | [PDF](pdfs/sound-money-for-the-arts.pdf) |
 
+### Editorial articles (Substack mirrors)
+
+| Slug | Title | Companion report |
+|---|---|---|
+| [`articles/the-arpa-cliff/`](articles/the-arpa-cliff/) | The ARPA Cliff | *The ARPA Cliff* |
+| [`articles/the-blueprint-david-simon-left-behind/`](articles/the-blueprint-david-simon-left-behind/) | The Blueprint David Simon Left Behind | *The ARPA Cliff* + *State of Arts Funding 2026* |
+| [`articles/the-lights-are-going-out/`](articles/the-lights-are-going-out/) | The Lights Are Going Out. Bitcoin Is the Only Switch Left. | *State of Arts Funding 2026* |
+| [`articles/is-war-good-for-bitcoin/`](articles/is-war-good-for-bitcoin/) | Is War Good for Bitcoin? | *Sound Money for the Arts* |
+
 ### Planned and in-progress
 
 - **Patronage History — From the Renaissance to Bitcoin**
