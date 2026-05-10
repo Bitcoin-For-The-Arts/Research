@@ -75,7 +75,8 @@ The economic, fiscal, demographic, and institutional reality of how the arts are
 ├── media/               ← charts, figures, images used across reports
 │   ├── charts/
 │   └── images/
-└── pdfs/                ← downloadable, print-ready PDFs of each report
+├── pdfs/                ← downloadable, print-ready PDFs of each report
+└── scripts/             ← build + validation tooling (npm run validate:data, build:pdfs)
 ```
 
 > **The canonical, web-rendered version of each report lives at [bitcoinforthearts.org/research](https://bitcoinforthearts.org/research).** This repository is the open, citable, version-controlled source of truth that mirrors and extends the portal — so journalists, foundation officers, and academic researchers can audit our evidence and contribute corrections.
@@ -84,11 +85,11 @@ The economic, fiscal, demographic, and institutional reality of how the arts are
 
 ## Current reports (v1)
 
-| # | Report | Status | Web | Source |
-|---|---|---|---|---|
-| 1 | **The State of Arts Funding 2026** — flagship annual | Published v1 | [Read](https://bitcoinforthearts.org/research/state-of-arts-funding-2026) | [`reports/state-of-arts-funding-2026/`](reports/state-of-arts-funding-2026/) |
-| 2 | **The ARPA Cliff** — deep-dive on the 2026 expiration of pandemic arts stimulus | Published v1 | [Read](https://bitcoinforthearts.org/research/the-arpa-cliff) | [`reports/the-arpa-cliff/`](reports/the-arpa-cliff/) |
-| 3 | **Sound Money for the Arts** — how fiat debasement hits working artists, and why Bitcoin endowments change the funding horizon | Published v1 | [Read](https://bitcoinforthearts.org/research/sound-money-for-the-arts) | [`reports/sound-money-for-the-arts/`](reports/sound-money-for-the-arts/) |
+| # | Report | Status | Web | Cover sheet | Data | PDF |
+|---|---|---|---|---|---|---|
+| 1 | **The State of Arts Funding 2026** — flagship annual | Published v1 | [Read](https://bitcoinforthearts.org/research/state-of-arts-funding-2026) | [`reports/state-of-arts-funding-2026/`](reports/state-of-arts-funding-2026/) | [JSON](data/reports/state-of-arts-funding-2026.json) | [PDF](pdfs/state-of-arts-funding-2026.pdf) |
+| 2 | **The ARPA Cliff** — deep-dive on the 2026 expiration of pandemic arts stimulus | Published v1 | [Read](https://bitcoinforthearts.org/research/the-arpa-cliff) | [`reports/the-arpa-cliff/`](reports/the-arpa-cliff/) | [JSON](data/reports/the-arpa-cliff.json) | [PDF](pdfs/the-arpa-cliff.pdf) |
+| 3 | **Sound Money for the Arts** — how fiat debasement hits working artists, and why Bitcoin endowments change the funding horizon | Published v1 | [Read](https://bitcoinforthearts.org/research/sound-money-for-the-arts) | [`reports/sound-money-for-the-arts/`](reports/sound-money-for-the-arts/) | [JSON](data/reports/sound-money-for-the-arts.json) | [PDF](pdfs/sound-money-for-the-arts.pdf) |
 
 ### Planned and in-progress
 
