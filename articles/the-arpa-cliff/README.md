@@ -16,7 +16,7 @@ The narrative, primary-source–cited editorial framing of *The ARPA Cliff* repo
 | **Editorial article** (this folder) | [`article.md`](article.md) | Narrative, accessible voice, journalist- and donor-readable. Substack-style. |
 | **Canonical research report** | [`reports/the-arpa-cliff/`](../../reports/the-arpa-cliff/) | Footnoted research document. Citable. |
 | **Citable chart data** | [`data/reports/the-arpa-cliff.json`](../../data/reports/the-arpa-cliff.json) | Every figure used in either channel resolves here. |
-| **Print-ready PDF** | [`pdfs/the-arpa-cliff.pdf`](../../pdfs/the-arpa-cliff.pdf) | Brookings-register research brief generated from the JSON. |
+| **Print-ready PDF** | [`pdfs/the-arpa-cliff.pdf`](../../pdfs/the-arpa-cliff.pdf) | Print-ready research brief generated from the JSON. |
 
 ## Headline figures (with primary sources)
 
