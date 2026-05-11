@@ -23,10 +23,11 @@ BFTA's flagship annual report on public, private, and non-state-dependent fundin
 
 ## Source files
 
-- **Live web version:** [`bitcoinforthearts.org/research/state-of-arts-funding-2026`](https://bitcoinforthearts.org/research/state-of-arts-funding-2026) — rendered, public-facing version
-- **Canonical chart dataset:** [`../../data/reports/state-of-arts-funding-2026.json`](../../data/reports/state-of-arts-funding-2026.json) — citable source of truth for every hero stat and chart
+- **Canonical narrative:** [`report.md`](report.md) — full report prose, with `[^N]` citations resolving to the JSON sources, `{{chart:id}}` placeholders resolving to the JSON charts, and `{{hero-stats}}` and `::: whymatters` blocks.
+- **Canonical chart dataset:** [`../../data/reports/state-of-arts-funding-2026.json`](../../data/reports/state-of-arts-funding-2026.json) — citable source of truth for every hero stat, chart, and primary source.
+- **Live web version:** [`bitcoinforthearts.org/research/state-of-arts-funding-2026`](https://bitcoinforthearts.org/research/state-of-arts-funding-2026) — rendered, public-facing version.
 - **Hero image:** [`../../media/images/State-of-Funding-2026.jpg`](../../media/images/State-of-Funding-2026.jpg)
-- **Downloadable PDF:** [`../../pdfs/state-of-arts-funding-2026.pdf`](../../pdfs/state-of-arts-funding-2026.pdf)
+- **Downloadable full PDF:** [`../../pdfs/state-of-arts-funding-2026.pdf`](../../pdfs/state-of-arts-funding-2026.pdf) — the complete report, generated from `report.md` + the JSON.
 
 ## How to cite
 

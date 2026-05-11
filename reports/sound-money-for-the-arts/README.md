@@ -26,7 +26,13 @@ BFTA's analytical case for why fiat debasement hits working artists harder than 
 - **Artist income data:** BLS Occupational Employment Statistics, NEA artist-employment studies, BEA ACPSA earnings tables
 - **Bitcoin reference:** Nakamoto (2008), *Bitcoin: A Peer-to-Peer Electronic Cash System*
 
-Full per-chart source IDs live in [`../../data/reports/sound-money-for-the-arts.json`](../../data/reports/sound-money-for-the-arts.json) — the canonical, citable source of truth. Hero image: [`../../media/images/Sound-Money-For-Sound-Arts.jpg`](../../media/images/Sound-Money-For-Sound-Arts.jpg). Downloadable PDF: [`../../pdfs/sound-money-for-the-arts.pdf`](../../pdfs/sound-money-for-the-arts.pdf).
+## Source files
+
+- **Canonical narrative:** [`report.md`](report.md) — full report prose, with `[^N]` citations and `{{chart:id}}` placeholders.
+- **Canonical chart dataset:** [`../../data/reports/sound-money-for-the-arts.json`](../../data/reports/sound-money-for-the-arts.json) — citable source of truth for every hero stat, chart, and primary source.
+- **Live web version:** [`bitcoinforthearts.org/research/sound-money-for-the-arts`](https://bitcoinforthearts.org/research/sound-money-for-the-arts).
+- **Hero image:** [`../../media/images/Sound-Money-For-Sound-Arts.jpg`](../../media/images/Sound-Money-For-Sound-Arts.jpg).
+- **Downloadable full PDF:** [`../../pdfs/sound-money-for-the-arts.pdf`](../../pdfs/sound-money-for-the-arts.pdf) — the complete report, generated from `report.md` + the JSON.
 
 ## Editorial scope reminder
 

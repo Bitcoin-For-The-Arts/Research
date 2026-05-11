@@ -27,7 +27,13 @@ A research brief on how temporary American Rescue Plan arts relief moved through
 - **2026** — SLFRF spend deadline (National League of Cities)
 - **$694.3M → $646.0M** — National state arts agency appropriations, FY2025 → FY2026 (Arts Midwest summary of NASAA data)
 
-Full source IDs and URLs live in [`../../data/reports/the-arpa-cliff.json`](../../data/reports/the-arpa-cliff.json) — the canonical, citable source of truth. Hero image: [`../../media/images/ARPA-Cliff.jpg`](../../media/images/ARPA-Cliff.jpg). Downloadable PDF: [`../../pdfs/the-arpa-cliff.pdf`](../../pdfs/the-arpa-cliff.pdf).
+## Source files
+
+- **Canonical narrative:** [`report.md`](report.md) — full report prose, with `[^N]` citations and `{{chart:id}}` placeholders.
+- **Canonical chart dataset:** [`../../data/reports/the-arpa-cliff.json`](../../data/reports/the-arpa-cliff.json) — citable source of truth for every hero stat, chart, and primary source.
+- **Live web version:** [`bitcoinforthearts.org/research/the-arpa-cliff`](https://bitcoinforthearts.org/research/the-arpa-cliff).
+- **Hero image:** [`../../media/images/ARPA-Cliff.jpg`](../../media/images/ARPA-Cliff.jpg).
+- **Downloadable full PDF:** [`../../pdfs/the-arpa-cliff.pdf`](../../pdfs/the-arpa-cliff.pdf) — the complete report, generated from `report.md` + the JSON.
 
 ## Companion editorial
 
